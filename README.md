@@ -25,49 +25,32 @@
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+# Chat Platform API
 
-## Installation
+This is the backend for the [halo-front](https://github.com/BohdanRusn/halo-front.git) project.
 
-```bash
-$ yarn install
-```
+# Installation & Setup
+## Setting up the Backend
 
-## Running the app
+1. Clone the repository.
+2. Run `yarn install` to install dependencies.
+3. Create a `.env` file in the root directory and paste the following:
 
-```bash
-# development
-$ yarn run start
+   ```
+   PG_HOST=
+   PG_USER=
+   PG_PASSWORD=
+   PG_PORT=
+   PG_DB=
 
-# watch mode
-$ yarn run start:dev
+   COOKIE_SECRET=
+   ```
 
-# production mode
-$ yarn run start:prod
-```
+    - **`PG_HOST`** The hostname for your PostgreSQL database server
+    - **`PG_USER`** The username for your PostgreSQL database
+    - **`PG_PASSWORD`** The password for your PostgreSQL user account
+    - **`PG_PORT`** The port your PostgreSQL server is running on (default 3306)
+    - **`PG_DB`** The name of your database (be sure to create it first otherwise an error will be thrown).
+    - **`COOKIE_SECRET`** Can be any string that can be used to encrypt & decrypt your cookie.
 
-## Test
-
-```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+4. Run `yarn start:dev` or `npm run start:dev` depending on which package manager you use to start the project in development mode.
