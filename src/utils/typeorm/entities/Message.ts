@@ -1,12 +1,12 @@
 import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseMessage } from './BaseMessage';
-import { Conversation } from './Conversation';
+import { Game } from './Game';
 import { MessageAttachment } from './MessageAttachment';
 
 @Entity({ name: 'messages' })
 export class Message extends BaseMessage {
-  @ManyToOne(() => Conversation, (conversation) => conversation.messages)
-  conversation: Conversation;
+  @ManyToOne(() => Game, (game) => game.messages)
+  game: Game;
 
   @OneToMany(() => MessageAttachment, (attachment) => attachment.message)
   @JoinColumn()

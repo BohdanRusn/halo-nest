@@ -53,7 +53,7 @@ export class MessageController {
 
   @Get()
   @SkipThrottle()
-  async getMessagesFromConversation(
+  async getMessagesFromGame(
     @AuthUser() user: User,
     @Param('id', ParseIntPipe) id: number,
   ) {
@@ -62,25 +62,25 @@ export class MessageController {
   }
 
   @Delete(':messageId')
-  async deleteMessageFromConversation(
+  async deleteMessageFromGame(
     @AuthUser() user: User,
-    @Param('id', ParseIntPipe) conversationId: number,
+    @Param('id', ParseIntPipe) gameId: number,
     @Param('messageId', ParseIntPipe) messageId: number,
   ) {
-    const params = { userId: user.id, conversationId, messageId };
+    const params = { userId: user.id, gameId, messageId };
     await this.messageService.deleteMessage(params);
     this.eventEmitter.emit('message.delete', params);
-    return { conversationId, messageId };
+    return { gameId, messageId };
   }
-  // api/conversations/:conversationId/messages/:messageId
+  // api/games/:gameId/messages/:messageId
   @Patch(':messageId')
   async editMessage(
     @AuthUser() { id: userId }: User,
-    @Param('id') conversationId: number,
+    @Param('id') gameId: number,
     @Param('messageId') messageId: number,
     @Body() { content }: EditMessageDto,
   ) {
-    const params = { userId, content, conversationId, messageId };
+    const params = { userId, content, gameId, messageId };
     const message = await this.messageService.editMessage(params);
     this.eventEmitter.emit('message.update', message);
     return message;

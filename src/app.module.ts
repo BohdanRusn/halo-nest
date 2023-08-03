@@ -4,7 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { ConversationsModule } from './conversations/conversations.module';
+import { GamesModule } from './games/games.module';
 import { MessagesModule } from './messages/messages.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -35,7 +35,7 @@ import * as process from 'process';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    ConversationsModule,
+    GamesModule,
     MessagesModule,
     GatewayModule,
     EventEmitterModule.forRoot(),

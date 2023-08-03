@@ -11,9 +11,9 @@ import {
 import { Message } from './Message';
 import { User } from './User';
 
-@Entity({ name: 'conversations' })
+@Entity({ name: 'games' })
 @Index(['creator.id', 'recipient.id'], { unique: true })
-export class Conversation {
+export class Game {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -25,7 +25,7 @@ export class Conversation {
   @JoinColumn()
   recipient: User;
 
-  @OneToMany(() => Message, (message) => message.conversation, {
+  @OneToMany(() => Message, (message) => message.game, {
     cascade: ['insert', 'remove', 'update'],
   })
   @JoinColumn()

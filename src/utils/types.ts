@@ -1,4 +1,4 @@
-import { Conversation, Friend, FriendRequest, Message, User } from './typeorm';
+import { Game, Friend, FriendRequest, Message, User } from './typeorm';
 import { Request } from 'express';
 
 export type CreateUserDetails = {
@@ -23,7 +23,7 @@ export type FindUserOptions = Partial<{
   selectAll: boolean;
 }>;
 
-export type CreateConversationParams = {
+export type CreateGameParams = {
   username: string;
   message: string;
 };
@@ -40,23 +40,23 @@ export type CreateMessageParams = {
 
 export type CreateMessageResponse = {
   message: Message;
-  conversation: Conversation;
+  game: Game;
 };
 
 export type DeleteMessageParams = {
   userId: number;
-  conversationId: number;
+  gameId: number;
   messageId: number;
 };
 
 export type FindMessageParams = {
   userId: number;
-  conversationId: number;
+  gameId: number;
   messageId: number;
 };
 
 export type EditMessageParams = {
-  conversationId: number;
+  gameId: number;
   messageId: number;
   userId: number;
   content: string;
@@ -103,12 +103,12 @@ export type UpdateUserProfileParams = Partial<{
   about: string;
 }>;
 
-export type GetConversationMessagesParams = {
+export type GetGameMessagesParams = {
   id: number;
   limit: number;
 };
 
-export type UpdateConversationParams = Partial<{
+export type UpdateGameParams = Partial<{
   id: number;
   lastMessageSent: Message;
 }>;

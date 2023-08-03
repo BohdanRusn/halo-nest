@@ -10,11 +10,11 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { IConversationsService } from '../conversations/conversations';
+import { IGamesService } from '../games/games';
 import { IFriendsService } from '../friends/friends';
 import { Services } from '../utils/constants';
 import { AuthenticatedSocket } from '../utils/interfaces';
-import { Conversation, Message } from '../utils/typeorm';
+import { Game, Message } from '../utils/typeorm';
 import { CreateMessageResponse } from '../utils/types';
 import { IGatewaySessionManager } from './gateway.session';
 
@@ -32,8 +32,8 @@ export class MessagingGateway
   constructor(
     @Inject(Services.GATEWAY_SESSION_MANAGER)
     readonly sessions: IGatewaySessionManager,
-    @Inject(Services.CONVERSATIONS)
-    private readonly conversationService: IConversationsService,
+    @Inject(Services.GAMES)
+    private readonly gameService: IGamesService,
     @Inject(Services.FRIENDS_SERVICE)
     private readonly friendsService: IFriendsService,
   ) {}
@@ -58,28 +58,28 @@ export class MessagingGateway
     console.log('Create Message');
   }
 
-  @SubscribeMessage('onConversationJoin')
-  onConversationJoin(
+  @SubscribeMessage('onGameJoin')
+  onGameJoin(
     @MessageBody() data: any,
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     console.log(
-      `${client.user?.id} joined a Conversation of ID: ${data.conversationId}`,
+      `${client.user?.id} joined a Game of ID: ${data.gameId}`,
     );
-    client.join(`conversation-${data.conversationId}`);
+    client.join(`game-${data.gameId}`);
     console.log(client.rooms);
-    client.to(`conversation-${data.conversationId}`).emit('userJoin');
+    client.to(`game-${data.gameId}`).emit('userJoin');
   }
 
-  @SubscribeMessage('onConversationLeave')
-  onConversationLeave(
+  @SubscribeMessage('onGameLeave')
+  onGameLeave(
     @MessageBody() data: any,
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
-    console.log('onConversationLeave');
-    client.leave(`conversation-${data.conversationId}`);
+    console.log('onGameLeave');
+    client.leave(`game-${data.gameId}`);
     console.log(client.rooms);
-    client.to(`conversation-${data.conversationId}`).emit('userLeave');
+    client.to(`game-${data.gameId}`).emit('userLeave');
   }
 
   @SubscribeMessage('onTypingStart')
@@ -88,9 +88,9 @@ export class MessagingGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     console.log('onTypingStart');
-    console.log(data.conversationId);
+    console.log(data.gameId);
     console.log(client.rooms);
-    client.to(`conversation-${data.conversationId}`).emit('onTypingStart');
+    client.to(`game-${data.gameId}`).emit('onTypingStart');
   }
 
   @SubscribeMessage('onTypingStop')
@@ -99,9 +99,9 @@ export class MessagingGateway
     @ConnectedSocket() client: AuthenticatedSocket,
   ) {
     console.log('onTypingStop');
-    console.log(data.conversationId);
+    console.log(data.gameId);
     console.log(client.rooms);
-    client.to(`conversation-${data.conversationId}`).emit('onTypingStop');
+    client.to(`game-${data.gameId}`).emit('onTypingStop');
   }
 
   @OnEvent('message.create')
@@ -112,7 +112,7 @@ export class MessagingGateway
     console.log('Inside message.create');
     const {
       author,
-      conversation: { creator, recipient },
+      game: { creator, recipient },
     } = payload.message;
     // const clients = io.sockets
     // this.sessions.getSockets();
@@ -126,22 +126,22 @@ export class MessagingGateway
     if (recipientSocket) recipientSocket.emit('onMessage', payload);
   }
 
-  @OnEvent('conversation.create')
-  handleConversationCreateEvent(payload: Conversation) {
-    console.log('Inside conversation.create');
+  @OnEvent('game.create')
+  handleGameCreateEvent(payload: Game) {
+    console.log('Inside game.create');
     const recipientSocket = this.sessions.getUserSocket(payload.recipient.id);
-    if (recipientSocket) recipientSocket.emit('onConversation', payload);
+    if (recipientSocket) recipientSocket.emit('onGame', payload);
   }
 
   @OnEvent('message.delete')
   async handleMessageDelete(payload) {
     console.log('Inside message.delete');
     console.log(payload);
-    const conversation = await this.conversationService.findById(
-      payload.conversationId,
+    const game = await this.gameService.findById(
+      payload.gameId,
     );
-    if (!conversation) return;
-    const { creator, recipient } = conversation;
+    if (!game) return;
+    const { creator, recipient } = game;
     const recipientSocket =
       creator.id === payload.userId
         ? this.sessions.getUserSocket(recipient.id)
@@ -153,7 +153,7 @@ export class MessagingGateway
   async handleMessageUpdate(message: Message) {
     const {
       author,
-      conversation: { creator, recipient },
+      game: { creator, recipient },
     } = message;
     console.log(message);
     const recipientSocket =

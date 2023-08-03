@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
-export class CreateConversationException extends HttpException {
+export class CreateGameException extends HttpException {
   constructor(msg?: string) {
-    const defaultMessage = 'Create Conversation Exception';
+    const defaultMessage = 'Create Game Exception';
     super(
       msg ? defaultMessage.concat(`:${msg}`) : defaultMessage,
       HttpStatus.BAD_REQUEST,

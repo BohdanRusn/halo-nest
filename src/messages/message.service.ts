@@ -2,13 +2,13 @@ import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { instanceToPlain } from 'class-transformer';
 import { Repository } from 'typeorm';
-import { IConversationsService } from '../conversations/conversations';
-import { ConversationNotFoundException } from '../conversations/exceptions/ConversationNotFound';
+import { IGamesService } from '../games/games';
+import { GameNotFoundException } from '../games/exceptions/GameNotFound';
 import { FriendNotFoundException } from '../friends/exceptions/FriendNotFound';
 import { IFriendsService } from '../friends/friends';
 import { buildFindMessageParams } from '../utils/builders';
 import { Services } from '../utils/constants';
-import { Conversation, Message } from '../utils/typeorm';
+import { Game, Message } from '../utils/typeorm';
 import {
   CreateMessageParams,
   DeleteMessageParams,
@@ -23,16 +23,16 @@ export class MessageService implements IMessageService {
   constructor(
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
-    @Inject(Services.CONVERSATIONS)
-    private readonly conversationService: IConversationsService,
+    @Inject(Services.GAMES)
+    private readonly gameService: IGamesService,
     @Inject(Services.FRIENDS_SERVICE)
     private readonly friendsService: IFriendsService,
   ) {}
   async createMessage(params: CreateMessageParams) {
     const { user, content, id } = params;
-    const conversation = await this.conversationService.findById(id);
-    if (!conversation) throw new ConversationNotFoundException();
-    const { creator, recipient } = conversation;
+    const game = await this.gameService.findById(id);
+    if (!game) throw new GameNotFoundException();
+    const { creator, recipient } = game;
     const isFriends = await this.friendsService.isFriends(
       creator.id,
       recipient.id,
@@ -42,53 +42,53 @@ export class MessageService implements IMessageService {
       throw new CannotCreateMessageException();
     const message = this.messageRepository.create({
       content,
-      conversation,
+      game,
       author: instanceToPlain(user),
     });
     const savedMessage = await this.messageRepository.save(message);
-    conversation.lastMessageSent = savedMessage;
-    const updated = await this.conversationService.save(conversation);
-    return { message: savedMessage, conversation: updated };
+    game.lastMessageSent = savedMessage;
+    const updated = await this.gameService.save(game);
+    return { message: savedMessage, game: updated };
   }
 
-  getMessages(conversationId: number): Promise<Message[]> {
+  getMessages(gameId: number): Promise<Message[]> {
     return this.messageRepository.find({
       relations: ['author', 'attachments', 'author.profile'],
-      where: { conversation: { id: conversationId } },
+      where: { game: { id: gameId } },
       order: { createdAt: 'DESC' },
     });
   }
 
   async deleteMessage(params: DeleteMessageParams) {
-    const { conversationId } = params;
-    const msgParams = { id: conversationId, limit: 5 };
-    const conversation = await this.conversationService.getMessages(msgParams);
-    if (!conversation) throw new ConversationNotFoundException();
+    const { gameId } = params;
+    const msgParams = { id: gameId, limit: 5 };
+    const game = await this.gameService.getMessages(msgParams);
+    if (!game) throw new GameNotFoundException();
     const findMessageParams = buildFindMessageParams(params);
     const message = await this.messageRepository.findOne({
       where: findMessageParams,
     });
     if (!message) throw new CannotDeleteMessage();
-    if (conversation.lastMessageSent.id !== message.id)
+    if (game.lastMessageSent.id !== message.id)
       return this.messageRepository.delete({ id: message.id });
-    return this.deleteLastMessage(conversation, message);
+    return this.deleteLastMessage(game, message);
   }
 
-  async deleteLastMessage(conversation: Conversation, message: Message) {
-    const size = conversation.messages.length;
+  async deleteLastMessage(game: Game, message: Message) {
+    const size = game.messages.length;
     const SECOND_MESSAGE_INDEX = 1;
     if (size <= 1) {
       console.log('Last Message Sent is deleted');
-      await this.conversationService.update({
-        id: conversation.id,
+      await this.gameService.update({
+        id: game.id,
         lastMessageSent: null,
       });
       return this.messageRepository.delete({ id: message.id });
     } else {
       console.log('There are more than 1 message');
-      const newLastMessage = conversation.messages[SECOND_MESSAGE_INDEX];
-      await this.conversationService.update({
-        id: conversation.id,
+      const newLastMessage = game.messages[SECOND_MESSAGE_INDEX];
+      await this.gameService.update({
+        id: game.id,
         lastMessageSent: newLastMessage,
       });
       return this.messageRepository.delete({ id: message.id });
@@ -102,9 +102,9 @@ export class MessageService implements IMessageService {
         author: { id: params.userId },
       },
       relations: [
-        'conversation',
-        'conversation.creator',
-        'conversation.recipient',
+        'game',
+        'game.creator',
+        'game.recipient',
         'author',
         'author.profile',
       ],

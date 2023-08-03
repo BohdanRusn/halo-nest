@@ -8,7 +8,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { IConversationsService } from '../conversations/conversations';
+import { IGamesService } from '../games/games';
 import { IUserService } from '../users/interfaces/user';
 import { Routes, Services } from '../utils/constants';
 import { AuthUser } from '../utils/decorators';
@@ -17,34 +17,34 @@ import { User } from '../utils/typeorm';
 @Controller(Routes.EXISTS)
 export class ExistsController {
   constructor(
-    @Inject(Services.CONVERSATIONS)
-    private readonly conversationsService: IConversationsService,
+    @Inject(Services.GAMES)
+    private readonly gamesService: IGamesService,
     @Inject(Services.USERS)
     private readonly userService: IUserService,
     private readonly events: EventEmitter2,
   ) {}
 
-  @Get('conversations/:recipientId')
-  async checkConversationExists(
+  @Get('games/:recipientId')
+  async checkGameExists(
     @AuthUser() user: User,
     @Param('recipientId', ParseIntPipe) recipientId: number,
   ) {
-    const conversation = await this.conversationsService.isCreated(
+    const game = await this.gamesService.isCreated(
       recipientId,
       user.id,
     );
-    if (conversation) return conversation;
+    if (game) return game;
     const recipient = await this.userService.findUser({ id: recipientId });
     if (!recipient)
       throw new HttpException('Recipient Not Found', HttpStatus.NOT_FOUND);
-    const newConversation = await this.conversationsService.createConversation(
+    const newGame = await this.gamesService.createGame(
       user,
       {
         username: recipient.username,
         message: 'hello',
       },
     );
-    this.events.emit('conversation.create', newConversation);
-    return newConversation;
+    this.events.emit('game.create', newGame);
+    return newGame;
   }
 }
