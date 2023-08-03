@@ -37,8 +37,6 @@ export class GamesService implements IGamesService {
       .leftJoinAndSelect('game.lastMessageSent', 'lastMessageSent')
       .leftJoinAndSelect('game.creator', 'creator')
       .leftJoinAndSelect('game.recipient', 'recipient')
-      .leftJoinAndSelect('creator.profile', 'creatorProfile')
-      .leftJoinAndSelect('recipient.profile', 'recipientProfile')
       .where('creator.id = :id', { id })
       .orWhere('recipient.id = :id', { id })
       .orderBy('game.lastMessageSentAt', 'DESC')
@@ -51,8 +49,6 @@ export class GamesService implements IGamesService {
       relations: [
         'creator',
         'recipient',
-        'creator.profile',
-        'recipient.profile',
         'lastMessageSent',
       ],
     });

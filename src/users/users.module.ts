@@ -1,29 +1,19 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Services } from '../utils/constants';
-import { Profile, User, UserPresence } from '../utils/typeorm';
+import { User, UserPresence } from '../utils/typeorm';
 import { UserPresenceController } from './controllers/user-presence.controller';
-import { UserProfilesController } from './controllers/user-profile.controller';
 import { UsersController } from './controllers/user.controller';
 import { UserPresenceService } from './services/user-presence.service';
-import { UserProfileService } from './services/user-profile.service';
 import { UserService } from './services/user.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserPresence, Profile])],
-  controllers: [
-    UsersController,
-    UserProfilesController,
-    UserPresenceController,
-  ],
+  imports: [TypeOrmModule.forFeature([User, UserPresence])],
+  controllers: [UsersController, UserPresenceController],
   providers: [
     {
       provide: Services.USERS,
       useClass: UserService,
-    },
-    {
-      provide: Services.USERS_PROFILES,
-      useClass: UserProfileService,
     },
     {
       provide: Services.USER_PRESENCE,
@@ -34,10 +24,6 @@ import { UserService } from './services/user.service';
     {
       provide: Services.USERS,
       useClass: UserService,
-    },
-    {
-      provide: Services.USERS_PROFILES,
-      useClass: UserProfileService,
     },
     {
       provide: Services.USER_PRESENCE,

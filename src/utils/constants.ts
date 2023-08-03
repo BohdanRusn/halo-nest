@@ -1,7 +1,6 @@
 export enum Routes {
   AUTH = 'auth',
   USERS = 'users',
-  USERS_PROFILES = 'users/profiles',
   GAMES = 'games',
   MESSAGES = 'games/:id/messages',
   EXISTS = 'exists',
@@ -13,7 +12,6 @@ export enum Routes {
 export enum Services {
   AUTH = 'AUTH_SERVICE',
   USERS = 'USERS_SERVICE',
-  USERS_PROFILES = 'USERS_PROFILES_SERVICE',
   USER_PRESENCE = 'USER_PRESENCE_SERVICE',
   GAMES = 'CONVERSATIONS_SERVICE',
   MESSAGES = 'MESSAGE_SERVICE',

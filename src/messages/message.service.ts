@@ -53,7 +53,7 @@ export class MessageService implements IMessageService {
 
   getMessages(gameId: number): Promise<Message[]> {
     return this.messageRepository.find({
-      relations: ['author', 'attachments', 'author.profile'],
+      relations: ['author', 'attachments'],
       where: { game: { id: gameId } },
       order: { createdAt: 'DESC' },
     });
@@ -101,13 +101,7 @@ export class MessageService implements IMessageService {
         id: params.messageId,
         author: { id: params.userId },
       },
-      relations: [
-        'game',
-        'game.creator',
-        'game.recipient',
-        'author',
-        'author.profile',
-      ],
+      relations: ['game', 'game.creator', 'game.recipient', 'author'],
     });
     if (!messageDB)
       throw new HttpException('Cannot Edit Message', HttpStatus.BAD_REQUEST);

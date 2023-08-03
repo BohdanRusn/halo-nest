@@ -99,10 +99,6 @@ export type RemoveFriendEventPayload = {
   userId: number;
 };
 
-export type UpdateUserProfileParams = Partial<{
-  about: string;
-}>;
-
 export type GetGameMessagesParams = {
   id: number;
   limit: number;

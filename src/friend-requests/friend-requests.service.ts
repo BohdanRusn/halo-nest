@@ -39,7 +39,7 @@ export class FriendRequestService implements IFriendRequestService {
         { sender: { id }, status },
         { receiver: { id }, status },
       ],
-      relations: ['receiver', 'sender', 'receiver.profile', 'sender.profile'],
+      relations: ['receiver', 'sender'],
     });
   }
 

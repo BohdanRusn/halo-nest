@@ -45,7 +45,7 @@ export class UserService implements IUserService {
     return this.userRepository.findOne({
       where: params,
       select: options?.selectAll ? selectionsWithPassword : selections,
-      relations: ['profile', 'presence'],
+      relations: ['presence'],
     });
   }
 
@@ -65,7 +65,6 @@ export class UserService implements IUserService {
         'user.lastName',
         'user.email',
         'user.id',
-        'user.profile',
       ])
       .getMany();
   }
